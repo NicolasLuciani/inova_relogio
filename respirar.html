@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Aequo — Respirar</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: { display: ['Manrope','sans-serif'], body: ['Inter','sans-serif'] },
+        colors: {
+          cream:'#F3F1EA', paper:'#FFFFFF', ink:'#2B3532', mute:'#6E7A76',
+          sage:{ DEFAULT:'#6E9080', light:'#E4EBE6', dim:'#DCE6E0' },
+          clay:{ DEFAULT:'#C98A5E', light:'#F3E3D6', dim:'#EFDCC9' },
+          rose:{ DEFAULT:'#A9614C', light:'#F1E0D9', dim:'#EAD2C6' },
+          line:'#E4E1D8',
+        },
+        keyframes: {
+          rise:{'0%':{transform:'translateY(10px)',opacity:'0'},'100%':{transform:'translateY(0)',opacity:'1'}},
+          idle:{'0%,100%':{transform:'scale(0.78)'},'50%':{transform:'scale(0.86)'}},
+        },
+        animation: { rise:'rise 0.45s ease-out', idle:'idle 6s ease-in-out infinite' }
+      }
+    }
+  }
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { background:#F3F1EA; }
+  .num-tab { font-variant-numeric: tabular-nums; }
+  ::-webkit-scrollbar { width:8px; }
+  ::-webkit-scrollbar-track { background:#F3F1EA; }
+  ::-webkit-scrollbar-thumb { background:#E4E1D8; border-radius:8px; }
+  .focus-ring:focus-visible { outline:2px solid #6E9080; outline-offset:2px; }
+  .nav-item.active { color:#6E9080; }
+  .glass { background: rgba(243,241,234,0.85); backdrop-filter: blur(10px); }
+  .duration-btn.active { background:#6E9080; color:#fff; border-color:#6E9080; }
+  #breath-circle { transition: transform 4s ease-in-out; }
+</style>
+</head>
+
+<body class="font-body text-ink antialiased min-h-screen pb-24">
+
+<header class="sticky top-0 z-30 border-b border-line glass">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+    <div class="flex items-center gap-2.5">
+      <div class="w-9 h-9 rounded-xl bg-sage-light flex items-center justify-center ring-1 ring-sage/25">
+        <i data-lucide="activity" class="w-4.5 h-4.5 text-sage"></i>
+      </div>
+      <div class="leading-tight">
+        <p class="font-display font-bold text-[16px] text-ink tracking-tight">Aequo</p>
+        <p class="text-[10.5px] text-mute -mt-0.5 hidden sm:block">um momento só seu</p>
+      </div>
+    </div>
+    <a href="index.html" class="focus-ring hidden sm:flex items-center gap-1.5 text-[11px] text-mute hover:text-ink transition">
+      <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> voltar ao estado
+    </a>
+  </div>
+</header>
+
+<main class="max-w-2xl mx-auto px-4 sm:px-6 pt-8 flex flex-col items-center">
+
+  <div class="w-full mb-2 animate-rise">
+    <p class="font-display font-bold text-xl text-ink text-center">Respirar</p>
+    <p class="text-[12.5px] text-mute text-center mt-1">Escolha uma duração e siga o círculo — ele cresce enquanto você inspira e encolhe enquanto expira.</p>
+  </div>
+
+  <!-- Seletor de duração -->
+  <div class="grid grid-cols-3 gap-2 w-full max-w-xs mt-6 animate-rise">
+    <button data-secs="60" onclick="selectDuration(60,this)" class="duration-btn active focus-ring text-xs font-semibold rounded-xl ring-1 ring-line bg-paper text-ink px-2 py-2.5 transition">1 min</button>
+    <button data-secs="180" onclick="selectDuration(180,this)" class="duration-btn focus-ring text-xs font-semibold rounded-xl ring-1 ring-line bg-paper text-ink px-2 py-2.5 transition">3 min</button>
+    <button data-secs="300" onclick="selectDuration(300,this)" class="duration-btn focus-ring text-xs font-semibold rounded-xl ring-1 ring-line bg-paper text-ink px-2 py-2.5 transition">5 min</button>
+  </div>
+
+  <!-- Área de respiração -->
+  <div class="relative w-60 h-60 sm:w-72 sm:h-72 flex items-center justify-center mt-10">
+    <div class="absolute inset-6 rounded-full bg-sage-dim/60"></div>
+    <div id="breath-circle" class="absolute inset-0 rounded-full bg-sage-light ring-1 ring-sage/25 animate-idle"></div>
+    <div class="relative z-10 flex flex-col items-center">
+      <span id="breath-instruction" class="font-display font-bold text-sage text-lg">Pronto?</span>
+      <span id="breath-timer" class="font-display font-extrabold text-3xl text-ink num-tab mt-1">01:00</span>
+    </div>
+  </div>
+
+  <p id="breath-hint" class="text-[12px] text-mute text-center mt-6 max-w-[280px] leading-relaxed">Toque em começar quando estiver pronto. Sem pressa.</p>
+
+  <button id="breath-btn" onclick="toggleBreathing()" class="focus-ring mt-6 px-8 py-3 rounded-full bg-sage text-white text-sm font-semibold hover:brightness-105 transition">
+    Começar
+  </button>
+
+  <div id="breath-done" class="hidden flex-col items-center text-center mt-6 animate-rise">
+    <i data-lucide="check-circle-2" class="w-8 h-8 text-sage mb-2"></i>
+    <p class="font-display font-semibold text-ink text-sm">Sessão concluída</p>
+    <p class="text-[11.5px] text-mute mt-1 max-w-[240px]">Bom trabalho em dar esse espaço pra você. Isso conta.</p>
+  </div>
+
+</main>
+
+<nav class="fixed bottom-0 inset-x-0 z-30 border-t border-line glass">
+  <div class="max-w-5xl mx-auto px-6 py-2.5 flex items-center justify-around">
+    <a href="index.html" class="nav-item flex flex-col items-center gap-1 text-mute/50 focus-ring px-4 py-1">
+      <i data-lucide="activity" class="w-5 h-5"></i>
+      <span class="text-[10px]">Estado</span>
+    </a>
+    <a href="respirar.html" class="nav-item active flex flex-col items-center gap-1 text-sage focus-ring px-4 py-1">
+      <i data-lucide="wind" class="w-5 h-5"></i>
+      <span class="text-[10px] font-medium">Respirar</span>
+    </a>
+    <a href="perfil.html" class="nav-item flex flex-col items-center gap-1 text-mute/50 focus-ring px-4 py-1">
+      <i data-lucide="user" class="w-5 h-5"></i>
+      <span class="text-[10px]">Perfil</span>
+    </a>
+  </div>
+</nav>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+  lucide.createIcons();
+
+  let totalSecs = 60;
+  let remaining = 60;
+  let running = false;
+  let breathTimer = null;
+  let phaseTimer = null;
+
+  function formatTime(s) {
+    const m = String(Math.floor(s / 60)).padStart(2,'0');
+    const sec = String(s % 60).padStart(2,'0');
+    return `${m}:${sec}`;
+  }
+
+  function selectDuration(secs, btn) {
+    if (running) return;
+    document.querySelectorAll('.duration-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    totalSecs = secs;
+    remaining = secs;
+    document.getElementById('breath-timer').textContent = formatTime(secs);
+  }
+
+  function runPhaseCycle() {
+    const circle = document.getElementById('breath-circle');
+    const instr = document.getElementById('breath-instruction');
+    let inhale = true;
+    function cycle() {
+      if (!running) return;
+      instr.textContent = inhale ? 'Inspire' : 'Expire';
+      circle.style.animation = 'none';
+      circle.style.transform = inhale ? 'scale(1)' : 'scale(0.62)';
+      inhale = !inhale;
+      phaseTimer = setTimeout(cycle, 4000);
+    }
+    cycle();
+  }
+
+  function toggleBreathing() {
+    if (running) { stopBreathing(false); return; }
+    running = true;
+    document.getElementById('breath-btn').textContent = 'Parar';
+    document.getElementById('breath-hint').classList.add('hidden');
+    document.getElementById('breath-done').classList.add('hidden');
+    document.querySelectorAll('.duration-btn').forEach(b => b.disabled = true);
+
+    document.getElementById('breath-circle').classList.remove('animate-idle');
+    runPhaseCycle();
+
+    breathTimer = setInterval(() => {
+      remaining--;
+      document.getElementById('breath-timer').textContent = formatTime(Math.max(remaining,0));
+      if (remaining <= 0) stopBreathing(true);
+    }, 1000);
+  }
+
+  function stopBreathing(completed) {
+    running = false;
+    clearInterval(breathTimer);
+    clearTimeout(phaseTimer);
+    document.getElementById('breath-btn').textContent = 'Começar';
+    document.querySelectorAll('.duration-btn').forEach(b => b.disabled = false);
+    document.getElementById('breath-circle').style.animation = '';
+    document.getElementById('breath-circle').classList.add('animate-idle');
+    document.getElementById('breath-circle').style.transform = '';
+    document.getElementById('breath-instruction').textContent = 'Pronto?';
+    remaining = totalSecs;
+    document.getElementById('breath-timer').textContent = formatTime(totalSecs);
+
+    if (completed) {
+      document.getElementById('breath-done').classList.remove('hidden');
+      document.getElementById('breath-done').classList.add('flex');
+    } else {
+      document.getElementById('breath-hint').classList.remove('hidden');
+    }
+  }
+</script>
+</body>
+</html>
