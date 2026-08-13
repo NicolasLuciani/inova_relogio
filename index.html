@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Pulso Livre — Apoio contra a ludopatia</title>
+
+<!-- Fontes -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: {
+          display: ['Sora', 'sans-serif'],
+          body: ['Inter', 'sans-serif'],
+          mono: ['JetBrains Mono', 'monospace'],
+        },
+        colors: {
+          deep:    { DEFAULT: '#070D16', 800: '#0A1420', 700: '#0D1826' },
+          panel:   { DEFAULT: '#101B2D', border: '#1C2C42' },
+          teal:    { DEFAULT: '#4FD1C5', dim: '#1D3A3A', bright: '#7EEAE0' },
+          gold:    { DEFAULT: '#F2C078', dim: '#3A2E17' },
+          warn:    { DEFAULT: '#FB8B24', dim: '#2E1D0D' },
+          crit:    { DEFAULT: '#E5484D', dim: '#2E1013' },
+        },
+        boxShadow: {
+          glow: '0 0 0 1px rgba(79,209,197,0.15), 0 8px 30px -6px rgba(79,209,197,0.15)',
+          goldglow: '0 0 0 1px rgba(242,192,120,0.15), 0 8px 30px -6px rgba(242,192,120,0.15)',
+        },
+        keyframes: {
+          heartbeat: {
+            '0%, 100%': { transform: 'scale(1)' },
+            '14%': { transform: 'scale(1.16)' },
+            '28%': { transform: 'scale(1)' },
+            '42%': { transform: 'scale(1.10)' },
+            '70%': { transform: 'scale(1)' },
+          },
+          ringpulse: {
+            '0%': { transform: 'scale(0.9)', opacity: '0.7' },
+            '80%': { transform: 'scale(1.9)', opacity: '0' },
+            '100%': { opacity: '0' },
+          },
+          breathe: {
+            '0%, 100%': { transform: 'scale(0.55)' },
+            '50%': { transform: 'scale(1)' },
+          },
+          dashline: {
+            '0%': { strokeDashoffset: '0' },
+            '100%': { strokeDashoffset: '-400' },
+          },
+          critblink: {
+            '0%, 100%': { backgroundColor: 'rgba(46,16,19,1)' },
+            '50%': { backgroundColor: 'rgba(80,15,20,1)' },
+          },
+          lockglow: {
+            '0%, 100%': { boxShadow: '0 0 40px 4px rgba(229,72,77,0.35)' },
+            '50%': { boxShadow: '0 0 70px 12px rgba(229,72,77,0.55)' },
+          },
+          slideUp: {
+            '0%': { transform: 'translateY(16px)', opacity: '0' },
+            '100%': { transform: 'translateY(0)', opacity: '1' },
+          },
+        },
+        animation: {
+          heartbeat: 'heartbeat 1.15s ease-in-out infinite',
+          ringpulse: 'ringpulse 1.15s ease-out infinite',
+          breathe: 'breathe 4s ease-in-out infinite',
+          dashline: 'dashline 6s linear infinite',
+          critblink: 'critblink 0.9s ease-in-out infinite',
+          lockglow: 'lockglow 1.6s ease-in-out infinite',
+          slideUp: 'slideUp 0.35s ease-out',
+        }
+      }
+    }
+  }
+</script>
+
+<style>
+  html { scroll-behavior: smooth; }
+  body { background-color: #070D16; }
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: #0A1420; }
+  ::-webkit-scrollbar-thumb { background: #1C2C42; border-radius: 8px; }
+  .bg-noise {
+    background-image: radial-gradient(circle at 20% 10%, rgba(79,209,197,0.07), transparent 40%),
+                       radial-gradient(circle at 85% 30%, rgba(242,192,120,0.05), transparent 35%);
+  }
+  .glass {
+    background: linear-gradient(180deg, rgba(16,27,45,0.85), rgba(13,22,38,0.85));
+    backdrop-filter: blur(10px);
+  }
+  .ecg-line { stroke: #4FD1C5; stroke-width: 1.6; fill: none; opacity: 0.55; }
+  .num-tabular { font-variant-numeric: tabular-nums; }
+  [x-cloak] { display: none !important; }
+  .focus-ring:focus-visible { outline: 2px solid #4FD1C5; outline-offset: 3px; }
+</style>
+</head>
+
+<body class="bg-deep text-slate-200 font-body antialiased bg-noise min-h-screen pb-28">
+
+<!-- ============ HEADER ============ -->
+<header class="sticky top-0 z-30 border-b border-panel-border/80 glass">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3">
+    <div class="flex items-center justify-between gap-3">
+      <!-- Logo -->
+      <div class="flex items-center gap-2.5">
+        <div class="relative w-9 h-9 rounded-xl bg-teal-dim flex items-center justify-center ring-1 ring-teal/30">
+          <i data-lucide="activity" class="w-5 h-5 text-teal"></i>
+        </div>
+        <div class="leading-tight">
+          <p class="font-display font-bold text-[17px] text-white tracking-tight">Pulso Livre</p>
+          <p class="text-[10.5px] text-slate-500 -mt-0.5 hidden sm:block">recomeço, um batimento por vez</p>
+        </div>
+      </div>
+
+      <!-- Status + BPM + Streak -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Watch status -->
+        <div class="hidden md:flex items-center gap-2 bg-panel/70 ring-1 ring-panel-border rounded-full pl-2.5 pr-3 py-1.5">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal opacity-60"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-teal"></span>
+          </span>
+          <i data-lucide="watch" class="w-3.5 h-3.5 text-slate-400"></i>
+          <span class="text-xs text-slate-300">Smartwatch Ativo <span class="text-slate-500">· Sync OK</span></span>
+        </div>
+
+        <!-- BPM badge -->
+        <div class="flex items-center gap-1.5 bg-panel/70 ring-1 ring-panel-border rounded-full pl-2 pr-3 py-1.5">
+          <i data-lucide="heart-pulse" class="w-3.5 h-3.5 text-crit animate-heartbeat"></i>
+          <span id="bpm-header" class="text-xs font-semibold text-white num-tabular">72 BPM</span>
+          <span id="bpm-header-tag" class="hidden sm:inline text-[10px] text-teal font-medium">· Normal</span>
+        </div>
+
+        <!-- Streak -->
+        <div class="flex items-center gap-1.5 bg-gold-dim/70 ring-1 ring-gold/30 rounded-full pl-2 pr-3 py-1.5">
+          <span class="text-sm leading-none">🔥</span>
+          <span class="text-xs font-semibold text-gold num-tabular">14 dias limpo</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ECG decorative line -->
+  <svg class="w-full h-4 -mb-1 opacity-70" viewBox="0 0 400 20" preserveAspectRatio="none">
+    <path class="ecg-line animate-dashline" stroke-dasharray="6 6" d="M0,10 L60,10 L72,10 L80,2 L88,18 L96,10 L140,10 L400,10" />
+  </svg>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 sm:px-6 mt-6 space-y-6">
+
+  <!-- ============ SAUDAÇÃO ============ -->
+  <section class="animate-slideUp">
+    <h1 class="font-display text-2xl sm:text-3xl font-bold text-white tracking-tight">Boa tarde, Marcos 👋</h1>
+    <p class="text-slate-400 text-sm mt-1">Seu relógio está monitorando seus sinais. Você está indo bem — continue firme.</p>
+  </section>
+
+  <!-- ============ PAINEL FINANCEIRO ============ -->
+  <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+    <!-- Dinheiro economizado -->
+    <div class="lg:col-span-1 rounded-2xl bg-panel ring-1 ring-panel-border p-5 shadow-goldglow flex flex-col justify-between">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-medium text-slate-400 uppercase tracking-wide">Dinheiro economizado</span>
+        <div class="w-8 h-8 rounded-lg bg-gold-dim flex items-center justify-center">
+          <i data-lucide="piggy-bank" class="w-4 h-4 text-gold"></i>
+        </div>
+      </div>
+      <p class="font-display text-3xl sm:text-4xl font-extrabold text-white mt-3 num-tabular">R$ 1.250<span class="text-gold">,00</span></p>
+      <p class="text-xs text-teal mt-1 flex items-center gap-1"><i data-lucide="trending-up" class="w-3.5 h-3.5"></i> +R$ 85,00 esta semana</p>
+
+      <div class="mt-4">
+        <div class="flex justify-between text-[11px] text-slate-400 mb-1.5">
+          <span>Meta: Viagem para a praia</span>
+          <span class="num-tabular">R$ 1.250 / R$ 2.500</span>
+        </div>
+        <div class="w-full h-2.5 rounded-full bg-deep-700 ring-1 ring-panel-border overflow-hidden">
+          <div class="h-full rounded-full bg-gradient-to-r from-gold to-teal" style="width:50%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Apostas evitadas / tempo salvo -->
+    <div class="rounded-2xl bg-panel ring-1 ring-panel-border p-5 flex flex-col gap-4">
+      <span class="text-xs font-medium text-slate-400 uppercase tracking-wide">Impacto direto</span>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="rounded-xl bg-deep-700/70 ring-1 ring-panel-border p-3.5">
+          <i data-lucide="shield-check" class="w-4 h-4 text-teal mb-2"></i>
+          <p class="font-display text-2xl font-bold text-white num-tabular">47</p>
+          <p class="text-[11px] text-slate-400 leading-tight mt-0.5">apostas evitadas</p>
+        </div>
+        <div class="rounded-xl bg-deep-700/70 ring-1 ring-panel-border p-3.5">
+          <i data-lucide="clock" class="w-4 h-4 text-teal mb-2"></i>
+          <p class="font-display text-2xl font-bold text-white num-tabular">38h</p>
+          <p class="text-[11px] text-slate-400 leading-tight mt-0.5">tempo devolvido à sua vida</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 text-[11px] text-slate-500 bg-teal-dim/40 ring-1 ring-teal/20 rounded-lg px-3 py-2">
+        <i data-lucide="info" class="w-3.5 h-3.5 text-teal shrink-0"></i>
+        Calculado a partir do seu histórico médio de apostas antes de começar sua jornada.
+      </div>
+    </div>
+
+    <!-- O que dá pra comprar -->
+    <div class="rounded-2xl bg-panel ring-1 ring-panel-border p-5">
+      <span class="text-xs font-medium text-slate-400 uppercase tracking-wide">Com esse valor, você já poderia ter:</span>
+      <ul class="mt-3 space-y-3">
+        <li class="flex items-center gap-3">
+          <i data-lucide="film" class="w-4 h-4 text-gold shrink-0"></i>
+          <div class="flex-1">
+            <div class="flex justify-between text-xs text-slate-300"><span>25 idas ao cinema</span><span class="text-slate-500">100%</span></div>
+            <div class="w-full h-1.5 rounded-full bg-deep-700 mt-1 overflow-hidden"><div class="h-full bg-gold rounded-full" style="width:100%"></div></div>
+          </div>
+        </li>
+        <li class="flex items-center gap-3">
+          <i data-lucide="tv" class="w-4 h-4 text-teal shrink-0"></i>
+          <div class="flex-1">
+            <div class="flex justify-between text-xs text-slate-300"><span>4 meses de streaming</span><span class="text-slate-500">80%</span></div>
+            <div class="w-full h-1.5 rounded-full bg-deep-700 mt-1 overflow-hidden"><div class="h-full bg-teal rounded-full" style="width:80%"></div></div>
+          </div>
+        </li>
+        <li class="flex items-center gap-3">
+          <i data-lucide="plane" class="w-4 h-4 text-slate-400 shrink-0"></i>
+          <div class="flex-1">
+            <div class="flex justify-between text-xs text-slate-300"><span>Viagem para a praia</span><span class="text-slate-500">50%</span></div>
+            <div class="w-full h-1.5 rounded-full bg-deep-700 mt-1 overflow-hidden"><div class="h-full bg-slate-400 rounded-full" style="width:50%"></div></div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ MONITOR DO RELÓGIO ============ -->
+  <section class="rounded-2xl bg-panel ring-1 ring-panel-border p-5 sm:p-6">
+    <div class="flex items-center justify-between mb-5">
+      <div>
+        <h2 class="font-display font-bold text-white text-lg flex items-center gap-2">
+          <i data-lucide="activity" class="w-4.5 h-4.5 text-teal"></i>
+          Monitor do relógio &amp; controle de estresse
+        </h2>
+        <p class="text-xs text-slate-500 mt-1">Dados sincronizados do seu smartwatch em tempo real.</p>
+      </div>
+      <span class="hidden sm:flex items-center gap-1.5 text-[11px] text-slate-500 bg-deep-700/60 ring-1 ring-panel-border rounded-full px-2.5 py-1">
+        <i data-lucide="refresh-cw" class="w-3 h-3"></i> atualizado há 4s
+      </span>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 items-center">
+      <!-- Gauge de estresse -->
+      <div class="lg:col-span-3">
+        <div class="flex items-end justify-between mb-2">
+          <div>
+            <p class="text-[11px] text-slate-400 uppercase tracking-wide">Nível de ansiedade estimado</p>
+            <p id="stress-label" class="font-display text-2xl font-bold text-teal">Calmo</p>
+          </div>
+          <p class="font-display text-3xl font-extrabold text-white num-tabular" id="stress-bpm">72 <span class="text-sm font-medium text-slate-500">BPM</span></p>
+        </div>
+        <div class="relative w-full h-3 rounded-full overflow-hidden ring-1 ring-panel-border">
+          <div class="absolute inset-0 bg-gradient-to-r from-teal via-warn to-crit"></div>
+          <div id="stress-marker" class="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white ring-2 ring-deep shadow-lg transition-all duration-700" style="left:18%"></div>
+        </div>
+        <div class="flex justify-between text-[10px] text-slate-500 mt-1.5 num-tabular">
+          <span>60 · Calmo</span><span>90 · Normal</span><span>110 · Atenção</span><span>130+ · Crítico</span>
+        </div>
+      </div>
+
+      <!-- Botão respiração -->
+      <div class="lg:col-span-2 flex flex-col items-center justify-center gap-3 rounded-xl bg-deep-700/60 ring-1 ring-panel-border p-5">
+        <div class="w-14 h-14 rounded-full bg-teal-dim flex items-center justify-center">
+          <i data-lucide="wind" class="w-6 h-6 text-teal"></i>
+        </div>
+        <p class="text-sm text-slate-300 text-center">Sinta o corpo acelerar? Respire com a gente por 1 minuto.</p>
+        <button onclick="openBreathing()" class="focus-ring w-full text-center px-4 py-2.5 rounded-xl bg-teal text-deep font-semibold text-sm hover:bg-teal-bright transition">
+          Iniciar respiração guiada
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CENTRAL DE APOIO ============ -->
+  <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+    <!-- SOS -->
+    <div class="rounded-2xl bg-gradient-to-br from-crit-dim to-panel ring-1 ring-crit/30 p-5 flex flex-col items-center text-center justify-center gap-3">
+      <div class="w-12 h-12 rounded-full bg-crit/15 flex items-center justify-center ring-1 ring-crit/40">
+        <i data-lucide="life-buoy" class="w-6 h-6 text-crit"></i>
+      </div>
+      <div>
+        <p class="font-display font-bold text-white">Precisa de ajuda agora?</p>
+        <p class="text-xs text-slate-400 mt-1">Fale com alguém imediatamente. Sem julgamentos.</p>
+      </div>
+      <button onclick="openSOS()" class="focus-ring w-full px-4 py-2.5 rounded-xl bg-crit text-white font-semibold text-sm hover:brightness-110 transition flex items-center justify-center gap-2">
+        <i data-lucide="phone-call" class="w-4 h-4"></i> Emergência / SOS
+      </button>
+    </div>
+
+    <!-- Frase do dia -->
+    <div class="rounded-2xl bg-panel ring-1 ring-panel-border p-5 flex flex-col justify-between">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-medium text-slate-400 uppercase tracking-wide">Frase do dia</span>
+        <button onclick="newQuote()" class="focus-ring w-7 h-7 rounded-lg bg-deep-700/60 ring-1 ring-panel-border flex items-center justify-center hover:bg-deep-700 transition">
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-slate-400"></i>
+        </button>
+      </div>
+      <p id="quote-text" class="font-display text-[17px] text-white leading-snug mt-3">"Você não precisa ver a escada inteira, só o próximo degrau."</p>
+      <p class="text-xs text-slate-500 mt-3">— Comunidade Pulso Livre</p>
+    </div>
+
+    <!-- Gatilhos -->
+    <div class="rounded-2xl bg-panel ring-1 ring-panel-border p-5">
+      <span class="text-xs font-medium text-slate-400 uppercase tracking-wide flex items-center gap-1.5">
+        <i data-lucide="triangle-alert" class="w-3.5 h-3.5 text-warn"></i> Gatilhos para evitar hoje
+      </span>
+      <ul class="mt-3 space-y-2">
+        <li class="flex items-center gap-2 text-xs text-slate-300 bg-deep-700/50 ring-1 ring-panel-border rounded-lg px-3 py-2">
+          <i data-lucide="bell-off" class="w-3.5 h-3.5 text-slate-500"></i> Notificações de apps de apostas
+        </li>
+        <li class="flex items-center gap-2 text-xs text-slate-300 bg-deep-700/50 ring-1 ring-panel-border rounded-lg px-3 py-2">
+          <i data-lucide="beer" class="w-3.5 h-3.5 text-slate-500"></i> Bares com telão de apostas esportivas
+        </li>
+        <li class="flex items-center gap-2 text-xs text-slate-300 bg-deep-700/50 ring-1 ring-panel-border rounded-lg px-3 py-2">
+          <i data-lucide="wallet" class="w-3.5 h-3.5 text-slate-500"></i> Dia de pagamento / saldo alto na conta
+        </li>
+        <li class="flex items-center gap-2 text-xs text-slate-300 bg-deep-700/50 ring-1 ring-panel-border rounded-lg px-3 py-2">
+          <i data-lucide="users" class="w-3.5 h-3.5 text-slate-500"></i> Grupos de apostas nas redes sociais
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ SIMULADOR DE EVENTOS DO RELÓGIO ============ -->
+  <section class="rounded-2xl bg-panel ring-1 ring-panel-border p-5 sm:p-6 mt-2">
+    <div class="flex items-start gap-2 mb-1">
+      <i data-lucide="gamepad-2" class="w-4.5 h-4.5 text-slate-400 mt-0.5"></i>
+      <div>
+        <h2 class="font-display font-bold text-white text-lg">Simulador de eventos do relógio</h2>
+        <p class="text-xs text-slate-500 mt-1">Área de teste — simule o que o Pulso Livre faz quando seu smartwatch detecta sinais de risco.</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
+      <button onclick="openWarning()" class="focus-ring group rounded-xl bg-warn-dim ring-1 ring-warn/40 p-4 text-left hover:ring-warn/70 transition">
+        <div class="flex items-center justify-between">
+          <span class="text-2xl">🟠</span>
+          <i data-lucide="arrow-up-right" class="w-4 h-4 text-warn opacity-0 group-hover:opacity-100 transition"></i>
+        </div>
+        <p class="font-semibold text-white text-sm mt-2">Aviso de atenção</p>
+        <p class="text-[11px] text-slate-400 mt-1">Simula BPM subindo para 95 e pico leve de estresse.</p>
+      </button>
+
+      <button onclick="openCritical()" class="focus-ring group rounded-xl bg-crit-dim ring-1 ring-crit/40 p-4 text-left hover:ring-crit/70 transition">
+        <div class="flex items-center justify-between">
+          <span class="text-2xl">🔴</span>
+          <i data-lucide="arrow-up-right" class="w-4 h-4 text-crit opacity-0 group-hover:opacity-100 transition"></i>
+        </div>
+        <p class="font-semibold text-white text-sm mt-2">Alerta crítico</p>
+        <p class="text-[11px] text-slate-400 mt-1">Simula BPM a 120 — ansiedade crítica, risco de aposta.</p>
+      </button>
+
+      <button onclick="openLockdown()" class="focus-ring group rounded-xl bg-deep-700/70 ring-1 ring-slate-600/50 p-4 text-left hover:ring-slate-400/60 transition">
+        <div class="flex items-center justify-between">
+          <span class="text-2xl">🚫</span>
+          <i data-lucide="arrow-up-right" class="w-4 h-4 text-slate-300 opacity-0 group-hover:opacity-100 transition"></i>
+        </div>
+        <p class="font-semibold text-white text-sm mt-2">Último aviso — bloqueio</p>
+        <p class="text-[11px] text-slate-400 mt-1">Simula o bloqueio total da interface por 15 minutos.</p>
+      </button>
+    </div>
+  </section>
+
+  <footer class="text-center text-[11px] text-slate-600 pt-2 pb-4">
+    Pulso Livre — protótipo de interface conectado a smartwatch fictício. Não substitui aconselhamento médico ou psicológico profissional.
+  </footer>
+</main>
+
+<!-- ============ SOS FLOATING BUTTON ============ -->
+<button onclick="openSOS()" aria-label="Abrir ajuda de emergência" class="focus-ring fixed bottom-5 right-5 z-40 w-14 h-14 rounded-full bg-crit text-white flex items-center justify-center shadow-[0_8px_24px_rgba(229,72,77,0.45)] hover:brightness-110 transition">
+  <i data-lucide="life-buoy" class="w-6 h-6"></i>
+</button>
+
+<!-- ============ MODAL: BREATHING ============ -->
+<div id="modal-breathing" class="hidden fixed inset-0 z-50 items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+  <div class="animate-slideUp w-full max-w-sm rounded-2xl bg-panel ring-1 ring-panel-border p-6 text-center relative">
+    <button onclick="closeModal('modal-breathing')" class="focus-ring absolute top-4 right-4 text-slate-500 hover:text-slate-300"><i data-lucide="x" class="w-5 h-5"></i></button>
+    <p class="text-xs uppercase tracking-wide text-slate-400 mb-1">Respiração guiada</p>
+    <h3 class="font-display text-xl font-bold text-white mb-5">Vamos acalmar o corpo</h3>
+
+    <div class="relative w-40 h-40 mx-auto flex items-center justify-center">
+      <div id="breathe-circle" class="absolute inset-0 rounded-full bg-teal/20 ring-1 ring-teal/40 animate-breathe"></div>
+      <div class="relative z-10 flex flex-col items-center">
+        <span id="breathe-instruction" class="font-display text-lg font-bold text-teal">Inspire</span>
+        <span id="breathe-timer" class="text-2xl font-bold text-white num-tabular mt-1">60s</span>
+      </div>
+    </div>
+
+    <p class="text-xs text-slate-400 mt-5">Siga o círculo: inspire enquanto ele cresce, expire enquanto encolhe.</p>
+    <button onclick="closeModal('modal-breathing')" class="focus-ring mt-5 w-full px-4 py-2.5 rounded-xl bg-deep-700 ring-1 ring-panel-border text-slate-300 text-sm font-medium hover:bg-deep-700/70 transition">
+      Encerrar exercício
+    </button>
+  </div>
+</div>
+
+<!-- ============ MODAL: SOS ============ -->
+<div id="modal-sos" class="hidden fixed inset-0 z-50 items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+  <div class="animate-slideUp w-full max-w-sm rounded-2xl bg-panel ring-1 ring-crit/40 p-6 relative">
+    <button onclick="closeModal('modal-sos')" class="focus-ring absolute top-4 right-4 text-slate-500 hover:text-slate-300"><i data-lucide="x" class="w-5 h-5"></i></button>
+    <div class="w-11 h-11 rounded-full bg-crit/15 ring-1 ring-crit/40 flex items-center justify-center mb-3">
+      <i data-lucide="life-buoy" class="w-5 h-5 text-crit"></i>
+    </div>
+    <h3 class="font-display text-lg font-bold text-white">Você não está sozinho</h3>
+    <p class="text-sm text-slate-400 mt-1.5">Escolha uma opção de apoio imediato. Estamos com você agora.</p>
+    <div class="mt-4 space-y-2">
+      <button class="focus-ring w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-crit text-white text-sm font-semibold hover:brightness-110 transition">
+        <i data-lucide="phone" class="w-4 h-4"></i> Ligar para CVV — 188
+      </button>
+      <button class="focus-ring w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-deep-700 ring-1 ring-panel-border text-slate-200 text-sm font-medium hover:bg-deep-700/70 transition">
+        <i data-lucide="message-circle" class="w-4 h-4 text-teal"></i> Falar com um padrinho da rede de apoio
+      </button>
+      <button onclick="openBreathing(); closeModal('modal-sos');" class="focus-ring w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-deep-700 ring-1 ring-panel-border text-slate-200 text-sm font-medium hover:bg-deep-700/70 transition">
+        <i data-lucide="wind" class="w-4 h-4 text-teal"></i> Fazer respiração guiada agora
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL: WARNING (LARANJA) ============ -->
+<div id="modal-warning" class="hidden fixed inset-0 z-50 items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+  <div class="animate-slideUp w-full max-w-sm rounded-2xl bg-panel ring-2 ring-warn/60 p-6 text-center relative">
+    <div class="w-14 h-14 rounded-full bg-warn-dim ring-1 ring-warn/50 flex items-center justify-center mx-auto">
+      <i data-lucide="triangle-alert" class="w-7 h-7 text-warn"></i>
+    </div>
+    <span class="inline-block mt-4 text-[11px] font-semibold text-warn bg-warn-dim rounded-full px-3 py-1">SINAL DO SMARTWATCH</span>
+    <h3 class="font-display text-xl font-bold text-white mt-3">Batimento subiu para 95 BPM</h3>
+    <p class="text-sm text-slate-300 mt-2 leading-relaxed">Atenção! Detectamos elevação no seu estresse. Faça uma pausa e tome uma água antes de tomar qualquer decisão.</p>
+    <div class="grid grid-cols-2 gap-2 mt-5">
+      <button onclick="closeModal('modal-warning')" class="focus-ring px-4 py-2.5 rounded-xl bg-deep-700 ring-1 ring-panel-border text-slate-300 text-sm font-medium hover:bg-deep-700/70 transition">
+        Estou bem
+      </button>
+      <button onclick="openBreathing(); closeModal('modal-warning');" class="focus-ring px-4 py-2.5 rounded-xl bg-warn text-deep text-sm font-semibold hover:brightness-110 transition">
+        Respirar agora
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL: CRITICAL (VERMELHO) ============ -->
+<div id="modal-critical" class="hidden fixed inset-0 z-50 items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+  <div class="animate-slideUp animate-critblink w-full max-w-sm rounded-2xl ring-2 ring-crit p-6 text-center relative shadow-[0_0_60px_rgba(229,72,77,0.4)]">
+    <div class="w-14 h-14 rounded-full bg-crit/20 ring-2 ring-crit flex items-center justify-center mx-auto animate-heartbeat">
+      <i data-lucide="octagon-alert" class="w-7 h-7 text-crit"></i>
+    </div>
+    <span class="inline-block mt-4 text-[11px] font-bold text-white bg-crit rounded-full px-3 py-1 tracking-wide">ALERTA CRÍTICO</span>
+    <h3 class="font-display text-2xl font-extrabold text-white mt-3">PARE AGORA!</h3>
+    <p class="text-sm text-slate-200 mt-2 leading-relaxed">Seu nível de ansiedade está crítico (120 BPM). Não abra aplicativos de apostas. Respire fundo!</p>
+    <div class="flex flex-col gap-2 mt-5">
+      <button onclick="openBreathing(); closeModal('modal-critical');" class="focus-ring px-4 py-3 rounded-xl bg-crit text-white text-sm font-bold hover:brightness-110 transition">
+        Respirar fundo agora
+      </button>
+      <button onclick="openSOS(); closeModal('modal-critical');" class="focus-ring px-4 py-2.5 rounded-xl bg-transparent ring-1 ring-crit/50 text-crit text-sm font-semibold hover:bg-crit/10 transition">
+        Falar com alguém — SOS
+      </button>
+      <button onclick="closeModal('modal-critical')" class="focus-ring text-xs text-slate-500 hover:text-slate-300 mt-1">Fechar aviso</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL: LOCKDOWN (BLOQUEIO) ============ -->
+<div id="modal-lockdown" class="hidden fixed inset-0 z-[60] items-center justify-center p-4 bg-black">
+  <div class="animate-slideUp animate-lockglow w-full max-w-sm rounded-2xl bg-[#0D0304] ring-2 ring-crit p-7 text-center">
+    <div class="w-16 h-16 rounded-full bg-crit/15 ring-2 ring-crit flex items-center justify-center mx-auto">
+      <i data-lucide="lock" class="w-8 h-8 text-crit"></i>
+    </div>
+    <span class="inline-block mt-4 text-[11px] font-bold text-white bg-crit rounded-full px-3 py-1 tracking-wide">SISTEMA BLOQUEADO</span>
+    <h3 class="font-display text-xl font-extrabold text-white mt-3">Acesso restrito temporariamente</h3>
+    <p class="text-sm text-slate-300 mt-2 leading-relaxed">Para sua segurança financeira e emocional, o acesso a esta plataforma e o uso do celular serão restringidos pelos próximos 15 minutos.</p>
+
+    <div class="mt-6 flex flex-col items-center">
+      <p class="text-[11px] uppercase tracking-wide text-slate-500">Tempo restante</p>
+      <p id="lockdown-timer" class="font-mono text-4xl font-bold text-crit num-tabular mt-1">15:00</p>
+    </div>
+
+    <div class="mt-6 flex items-center justify-center gap-2 text-xs text-slate-400 bg-white/5 rounded-lg px-3 py-2">
+      <i data-lucide="wind" class="w-4 h-4 text-teal shrink-0"></i>
+      Aproveite este tempo para respirar e se afastar da tela.
+    </div>
+
+    <button onclick="cancelLockdown()" class="focus-ring mt-6 text-[11px] text-slate-600 hover:text-slate-400 underline underline-offset-2">
+      Encerrar simulação (apenas para teste)
+    </button>
+  </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+  lucide.createIcons();
+
+  // ---------- Helpers de modal ----------
+  function openModal(id) {
+    const el = document.getElementById(id);
+    el.classList.remove('hidden');
+    el.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal(id) {
+    const el = document.getElementById(id);
+    el.classList.add('hidden');
+    el.classList.remove('flex');
+    document.body.style.overflow = '';
+  }
+
+  // ---------- Respiração guiada ----------
+  let breathInterval = null;
+  function openBreathing() {
+    openModal('modal-breathing');
+    let seconds = 60;
+    const timerEl = document.getElementById('breathe-timer');
+    const instrEl = document.getElementById('breathe-instruction');
+    timerEl.textContent = seconds + 's';
+    clearInterval(breathInterval);
+    breathInterval = setInterval(() => {
+      seconds--;
+      timerEl.textContent = Math.max(seconds, 0) + 's';
+      const phase = seconds % 8;
+      instrEl.textContent = phase >= 4 ? 'Inspire' : 'Expire';
+      if (seconds <= 0) {
+        clearInterval(breathInterval);
+        instrEl.textContent = 'Concluído 🎉';
+      }
+    }, 1000);
+  }
+  const origClose = closeModal;
+  function closeBreathingCleanup() { clearInterval(breathInterval); }
+
+  // ---------- SOS ----------
+  function openSOS() { openModal('modal-sos'); }
+
+  // ---------- Frase do dia ----------
+  const quotes = [
+    '"Você não precisa ver a escada inteira, só o próximo degrau."',
+    '"Cada dia limpo é uma vitória que ninguém pode tirar de você."',
+    '"A vontade passa. A sua liberdade fica."',
+    '"Você já provou que consegue dizer não. Prove de novo hoje."',
+    '"O impulso dura minutos. O arrependimento pode durar meses."',
+    '"Recomeçar também é uma forma de vencer."',
+  ];
+  function newQuote() {
+    const el = document.getElementById('quote-text');
+    let q;
+    do { q = quotes[Math.floor(Math.random() * quotes.length)]; } while (q === el.textContent);
+    el.textContent = q;
+  }
+
+  // ---------- Simulações de eventos do relógio ----------
+  function setStressGauge(bpm, label, colorClass) {
+    document.getElementById('bpm-header').textContent = bpm + ' BPM';
+    document.getElementById('stress-bpm').innerHTML = bpm + ' <span class="text-sm font-medium text-slate-500">BPM</span>';
+    document.getElementById('stress-label').textContent = label;
+    document.getElementById('stress-label').className = 'font-display text-2xl font-bold ' + colorClass;
+    const pct = Math.min(Math.max((bpm - 55) / (140 - 55) * 100, 4), 96);
+    document.getElementById('stress-marker').style.left = pct + '%';
+  }
+
+  function openWarning() {
+    setStressGauge(95, 'Atenção', 'text-warn');
+    openModal('modal-warning');
+  }
+  function openCritical() {
+    setStressGauge(120, 'Crítico', 'text-crit');
+    openModal('modal-critical');
+  }
+
+  let lockdownInterval = null;
+  function openLockdown() {
+    setStressGauge(128, 'Crítico', 'text-crit');
+    openModal('modal-lockdown');
+    let total = 15 * 60;
+    const timerEl = document.getElementById('lockdown-timer');
+    clearInterval(lockdownInterval);
+    lockdownInterval = setInterval(() => {
+      total--;
+      const m = String(Math.floor(total / 60)).padStart(2, '0');
+      const s = String(total % 60).padStart(2, '0');
+      timerEl.textContent = m + ':' + s;
+      if (total <= 0) {
+        clearInterval(lockdownInterval);
+        cancelLockdown();
+      }
+    }, 1000);
+  }
+  function cancelLockdown() {
+    clearInterval(lockdownInterval);
+    closeModal('modal-lockdown');
+    setStressGauge(72, 'Calmo', 'text-teal');
+  }
+
+  // Fechar modais clicando fora + limpar timers de respiração
+  document.querySelectorAll('[id^="modal-"]').forEach(modal => {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal && modal.id !== 'modal-lockdown') {
+        closeModal(modal.id);
+        if (modal.id === 'modal-breathing') closeBreathingCleanup();
+      }
+    });
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('[id^="modal-"]').forEach(modal => {
+        if (!modal.classList.contains('hidden') && modal.id !== 'modal-lockdown') {
+          closeModal(modal.id);
+          if (modal.id === 'modal-breathing') closeBreathingCleanup();
+        }
+      });
+    }
+  });
+</script>
+</body>
+</html>
