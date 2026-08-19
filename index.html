@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-<title>Aequo — Estado</title>
+<title>Âncora — Entrar</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -21,456 +21,104 @@
           rose:{ DEFAULT:'#A9614C', light:'#F1E0D9', dim:'#EAD2C6' },
           line:'#E4E1D8',
         },
-        keyframes: {
-          fadeIn:{'0%':{opacity:'0'},'100%':{opacity:'1'}},
-          rise:{'0%':{transform:'translateY(10px)',opacity:'0'},'100%':{transform:'translateY(0)',opacity:'1'}},
-          breathe:{'0%,100%':{transform:'scale(0.72)'},'50%':{transform:'scale(1)'}},
-        },
-        animation: { fadeIn:'fadeIn 0.4s ease-out', rise:'rise 0.45s ease-out', breathe:'breathe 5s ease-in-out infinite' }
+        keyframes: { rise:{'0%':{transform:'translateY(10px)',opacity:'0'},'100%':{transform:'translateY(0)',opacity:'1'}} },
+        animation: { rise:'rise 0.5s ease-out' }
       }
     }
   }
 </script>
 <style>
-  html { scroll-behavior: smooth; }
-  body { background:#F3F1EA; }
-  .num-tab { font-variant-numeric: tabular-nums; }
-  ::-webkit-scrollbar { width:8px; }
-  ::-webkit-scrollbar-track { background:#F3F1EA; }
-  ::-webkit-scrollbar-thumb { background:#E4E1D8; border-radius:8px; }
+  html, body { background:#F3F1EA; }
   .focus-ring:focus-visible { outline:2px solid #6E9080; outline-offset:2px; }
-  .nav-item.active { color:#6E9080; }
-  .glass { background: rgba(243,241,234,0.85); backdrop-filter: blur(10px); }
+  input:focus { outline:none; }
+  .field:focus-within { border-color:#6E9080; background:#fff; }
 </style>
 </head>
 
-<body class="font-body text-ink antialiased min-h-screen pb-24">
+<body class="font-body text-ink antialiased min-h-screen flex items-center justify-center px-4 py-10">
 
-<!-- ======= HEADER ======= -->
-<header class="sticky top-0 z-30 border-b border-line glass">
-  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
-    <div class="flex items-center gap-2.5">
-      <div class="w-9 h-9 rounded-xl bg-sage-light flex items-center justify-center ring-1 ring-sage/25">
-        <i data-lucide="activity" class="w-4.5 h-4.5 text-sage"></i>
-      </div>
-      <div class="leading-tight">
-        <p class="font-display font-bold text-[16px] text-ink tracking-tight">Aequo</p>
-        <p class="text-[10.5px] text-mute -mt-0.5 hidden sm:block">equilíbrio, um passo por vez</p>
-      </div>
+<div class="w-full max-w-sm animate-rise">
+
+  <!-- Logo -->
+  <div class="flex flex-col items-center mb-8">
+    <div class="w-14 h-14 rounded-2xl bg-sage-light flex items-center justify-center ring-1 ring-sage/25 mb-3">
+      <i data-lucide="anchor" class="w-6 h-6 text-sage"></i>
     </div>
+    <p class="font-display font-bold text-xl text-ink tracking-tight">Âncora</p>
+    <p class="text-[12px] text-mute mt-0.5">firme, mesmo quando balança</p>
+  </div>
 
-    <div class="flex items-center gap-2">
-      <div class="hidden sm:flex items-center gap-1.5 bg-paper ring-1 ring-line rounded-full pl-2.5 pr-3 py-1.5">
-        <span class="w-1.5 h-1.5 rounded-full bg-sage"></span>
-        <i data-lucide="watch" class="w-3.5 h-3.5 text-mute"></i>
-        <span class="text-[11px] text-mute">Smartband M7 · Sincronizado</span>
+  <!-- Card de login -->
+  <div class="rounded-3xl bg-paper ring-1 ring-line p-6 sm:p-7">
+    <h1 class="font-display font-bold text-lg text-ink">Bem-vindo de volta</h1>
+    <p class="text-[12.5px] text-mute mt-1 mb-6">Entre para continuar seu acompanhamento.</p>
+
+    <form id="login-form" class="space-y-4">
+      <div>
+        <label for="login-email" class="text-[11px] text-mute font-medium uppercase tracking-wide">E-mail</label>
+        <div class="field mt-1.5 flex items-center gap-2 rounded-xl bg-cream ring-1 ring-line px-3.5 py-3 transition">
+          <i data-lucide="mail" class="w-4 h-4 text-mute shrink-0"></i>
+          <input id="login-email" type="email" required placeholder="voce@email.com"
+                 class="w-full bg-transparent text-[13.5px] text-ink placeholder:text-mute/60">
+        </div>
       </div>
-      <div class="flex items-center gap-1.5 bg-sage-light ring-1 ring-sage/25 rounded-full pl-2.5 pr-3 py-1.5">
-        <i data-lucide="calendar-check" class="w-3.5 h-3.5 text-sage"></i>
-        <span class="text-[11px] font-semibold text-sage num-tab">14 dias</span>
+
+      <div>
+        <label for="login-senha" class="text-[11px] text-mute font-medium uppercase tracking-wide">Senha</label>
+        <div class="field mt-1.5 flex items-center gap-2 rounded-xl bg-cream ring-1 ring-line px-3.5 py-3 transition">
+          <i data-lucide="lock" class="w-4 h-4 text-mute shrink-0"></i>
+          <input id="login-senha" type="password" required placeholder="••••••••"
+                 class="w-full bg-transparent text-[13.5px] text-ink placeholder:text-mute/60">
+        </div>
       </div>
-      <button id="demo-toggle" onclick="toggleDemo()" aria-label="Configurações" class="focus-ring w-8 h-8 rounded-full bg-paper ring-1 ring-line flex items-center justify-center text-mute/60 hover:text-mute transition">
-        <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+
+      <p id="login-error" class="hidden text-[11.5px] text-rose">Preencha e-mail e senha para continuar.</p>
+
+      <button type="submit" class="focus-ring w-full px-4 py-3 rounded-xl bg-sage text-white text-sm font-semibold hover:brightness-105 transition flex items-center justify-center gap-2">
+        Entrar <i data-lucide="arrow-right" class="w-4 h-4"></i>
       </button>
-    </div>
-  </div>
-</header>
+    </form>
 
-<main class="max-w-5xl mx-auto px-4 sm:px-6 pt-6">
-
-  <!-- Saudação -->
-  <div class="mb-5 animate-rise">
-    <p class="text-[11px] text-mute tracking-wide">Boa tarde</p>
-    <p class="font-display font-bold text-xl text-ink -mt-0.5">Marcos</p>
-    <p class="text-[12.5px] text-mute mt-1">Seus sinais estão sendo acompanhados. Você está indo bem.</p>
-  </div>
-
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-
-    <!-- IVA -->
-    <div class="lg:col-span-2 rounded-3xl bg-paper ring-1 ring-line p-5 sm:p-6 animate-rise">
-      <p class="text-[11px] text-mute tracking-wide uppercase">Índice de Vulnerabilidade à Aposta</p>
-      <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 mt-3">
-        <div class="relative w-32 h-32 shrink-0">
-          <svg viewBox="0 0 100 100" class="w-full h-full -rotate-90">
-            <circle cx="50" cy="50" r="42" fill="none" stroke="#E4E1D8" stroke-width="9"/>
-            <circle id="iva-ring" cx="50" cy="50" r="42" fill="none" stroke="#6E9080" stroke-width="9"
-                    stroke-linecap="round" stroke-dasharray="264" stroke-dashoffset="205"
-                    style="transition: stroke-dashoffset 1.2s ease, stroke 1.2s ease" />
-          </svg>
-          <div class="absolute inset-0 flex flex-col items-center justify-center">
-            <span id="iva-number" class="font-display font-extrabold text-3xl text-ink num-tab">22</span>
-            <span class="text-[10px] text-mute -mt-0.5">de 100</span>
-          </div>
-        </div>
-        <div class="flex-1 text-center sm:text-left">
-          <p id="iva-label" class="font-display font-bold text-sage text-lg">Estável</p>
-          <p id="iva-desc" class="text-[13px] text-mute mt-1.5 leading-relaxed max-w-sm">Seus sinais indicam baixo risco de decisão impulsiva de aposta agora.</p>
-          <div class="grid grid-cols-2 gap-3 mt-4 max-w-xs mx-auto sm:mx-0">
-            <div class="rounded-xl bg-cream p-3">
-              <i data-lucide="heart" class="w-3.5 h-3.5 text-clay mb-1.5"></i>
-              <p id="fc-number" class="font-display font-bold text-lg text-ink num-tab">76</p>
-              <p class="text-[10px] text-mute">bpm</p>
-            </div>
-            <div class="rounded-xl bg-cream p-3">
-              <i data-lucide="footprints" class="w-3.5 h-3.5 text-sage mb-1.5"></i>
-              <p id="mov-status" class="font-display font-bold text-lg text-ink">Parado</p>
-              <p class="text-[10px] text-mute">há 12 min</p>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="flex items-center gap-3 my-5">
+      <div class="flex-1 h-px bg-line"></div>
+      <span class="text-[10.5px] text-mute">ou</span>
+      <div class="flex-1 h-px bg-line"></div>
     </div>
 
-    <!-- Financeiro resumido -->
-    <div class="rounded-3xl bg-paper ring-1 ring-line p-5 animate-rise" style="animation-delay:.05s">
-      <div class="flex items-center justify-between">
-        <p class="text-[11px] text-mute tracking-wide uppercase">Deixou de apostar</p>
-        <i data-lucide="piggy-bank" class="w-4 h-4 text-clay"></i>
-      </div>
-      <p class="font-display font-extrabold text-2xl text-ink mt-2 num-tab">R$ 1.250,00</p>
-      <div class="mt-3">
-        <div class="flex justify-between text-[10.5px] text-mute mb-1">
-          <span>Fundo de emergência</span>
-          <span class="num-tab">50%</span>
-        </div>
-        <div class="w-full h-2 rounded-full bg-cream ring-1 ring-line overflow-hidden">
-          <div class="h-full rounded-full bg-clay" style="width:50%"></div>
-        </div>
-      </div>
-      <a href="perfil.html" class="focus-ring mt-4 inline-flex items-center gap-1 text-[11px] text-sage font-medium">
-        ver detalhes no perfil <i data-lucide="arrow-right" class="w-3 h-3"></i>
-      </a>
-    </div>
-  </div>
-
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
-
-    <!-- Histórico -->
-    <div class="rounded-2xl bg-paper ring-1 ring-line p-4 animate-rise" style="animation-delay:.1s">
-      <div class="flex items-center justify-between mb-2">
-        <p class="text-[11px] text-mute tracking-wide uppercase">Últimas horas</p>
-        <span class="text-[10.5px] text-mute">Hoje</span>
-      </div>
-      <svg viewBox="0 0 280 60" class="w-full h-14">
-        <polyline id="history-line" points="0,45 40,42 80,44 120,40 160,20 200,38 240,42 280,44"
-                  fill="none" stroke="#6E9080" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle id="history-dot" cx="280" cy="44" r="3.5" fill="#6E9080"/>
-      </svg>
-      <div class="flex justify-between text-[9.5px] text-mute mt-1 num-tab">
-        <span>08h</span><span>12h</span><span>16h</span><span>agora</span>
-      </div>
-    </div>
-
-    <!-- Frase do dia -->
-    <div class="rounded-2xl bg-paper ring-1 ring-line p-4 flex flex-col justify-between animate-rise" style="animation-delay:.15s">
-      <div class="flex items-center justify-between">
-        <p class="text-[11px] text-mute tracking-wide uppercase">Frase do dia</p>
-        <button onclick="newQuote()" aria-label="Nova frase" class="focus-ring w-7 h-7 rounded-lg bg-cream ring-1 ring-line flex items-center justify-center hover:bg-sage-light transition">
-          <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-mute"></i>
-        </button>
-      </div>
-      <p id="quote-text" class="font-display text-[14.5px] text-ink leading-snug mt-2.5">"Você não precisa ver a escada inteira, só o próximo degrau."</p>
-      <p class="text-[10.5px] text-mute mt-2">— Comunidade Aequo</p>
-    </div>
-
-    <!-- Gatilhos -->
-    <div class="rounded-2xl bg-paper ring-1 ring-line p-4 animate-rise" style="animation-delay:.2s">
-      <p class="text-[11px] text-mute tracking-wide uppercase mb-3 flex items-center gap-1.5">
-        <i data-lucide="eye" class="w-3.5 h-3.5 text-clay"></i> Gatilhos para observar hoje
-      </p>
-      <ul class="space-y-2">
-        <li class="flex items-center gap-2.5 text-[12px] text-ink/80 bg-cream rounded-xl px-3 py-2">
-          <i data-lucide="bell-off" class="w-3.5 h-3.5 text-mute shrink-0"></i> Notificações de apps de apostas
-        </li>
-        <li class="flex items-center gap-2.5 text-[12px] text-ink/80 bg-cream rounded-xl px-3 py-2">
-          <i data-lucide="wallet" class="w-3.5 h-3.5 text-mute shrink-0"></i> Dia de pagamento ou saldo alto
-        </li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- SOS -->
-  <div class="rounded-2xl bg-rose-light ring-1 ring-rose/25 p-5 mt-4 flex flex-col sm:flex-row items-center gap-4 animate-rise" style="animation-delay:.25s">
-    <div class="w-11 h-11 rounded-full bg-paper ring-1 ring-rose/30 flex items-center justify-center shrink-0">
-      <i data-lucide="life-buoy" class="w-5 h-5 text-rose"></i>
-    </div>
-    <div class="flex-1 text-center sm:text-left">
-      <p class="font-display font-bold text-ink text-sm">Precisa de ajuda agora?</p>
-      <p class="text-[12px] text-mute mt-0.5">Fale com alguém imediatamente. Sem julgamentos.</p>
-    </div>
-    <button onclick="openSOS()" class="focus-ring w-full sm:w-auto px-5 py-2.5 rounded-xl bg-rose text-white font-semibold text-sm hover:brightness-105 transition flex items-center justify-center gap-2">
-      <i data-lucide="phone-call" class="w-4 h-4"></i> SOS
-    </button>
-  </div>
-
-  <!-- Nota de cuidado -->
-  <div class="flex items-start gap-2.5 rounded-2xl bg-sage-light/70 ring-1 ring-sage/20 p-4 mt-4 animate-rise" style="animation-delay:.3s">
-    <i data-lucide="shield-check" class="w-4 h-4 text-sage shrink-0 mt-0.5"></i>
-    <p class="text-[11.5px] text-ink/80 leading-relaxed">Esta ferramenta é preventiva e complementar. Ela não substitui acompanhamento médico ou psicológico profissional.</p>
-  </div>
-
-  <!-- painel demo discreto -->
-  <div id="demo-panel" class="hidden mt-4 rounded-2xl bg-ink/[0.04] ring-1 ring-dashed ring-mute/30 p-4 animate-rise mb-4">
-    <p class="text-[10.5px] text-mute uppercase tracking-wide mb-2 flex items-center gap-1.5">
-      <i data-lucide="flask-conical" class="w-3.5 h-3.5"></i> Modo demonstração
-    </p>
-    <p class="text-[11px] text-mute mb-3 leading-relaxed">Uso interno para a apresentação — simula os eventos que o wearable dispararia em campo.</p>
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-      <button onclick="setIVA(22)" class="focus-ring text-xs font-medium rounded-xl bg-paper ring-1 ring-line px-3 py-2 hover:ring-sage/40 transition">Estável</button>
-      <button onclick="setIVA(50)" class="focus-ring text-xs font-medium rounded-xl bg-paper ring-1 ring-line px-3 py-2 hover:ring-clay/40 transition">Atenção leve</button>
-      <button onclick="simulateRise()" class="focus-ring text-xs font-medium rounded-xl bg-paper ring-1 ring-line px-3 py-2 hover:ring-rose/40 transition">Elevação gradual</button>
-      <button onclick="openLockdown()" class="focus-ring text-xs font-medium rounded-xl bg-paper ring-1 ring-line px-3 py-2 hover:ring-rose/40 transition">Bloqueio total</button>
-    </div>
-  </div>
-</main>
-
-<!-- SOS flutuante -->
-<button onclick="openSOS()" aria-label="Abrir ajuda de emergência" class="focus-ring fixed bottom-24 right-5 z-40 rounded-full bg-rose text-white flex items-center justify-center shadow-lg hover:brightness-105 transition p-3.5">
-  <i data-lucide="life-buoy" class="w-5 h-5"></i>
-</button>
-
-<!-- NAV -->
-<nav class="fixed bottom-0 inset-x-0 z-30 border-t border-line glass">
-  <div class="max-w-5xl mx-auto px-6 py-2.5 flex items-center justify-around">
-    <a href="index.html" class="nav-item active flex flex-col items-center gap-1 text-sage focus-ring px-4 py-1">
-      <i data-lucide="activity" class="w-5 h-5"></i>
-      <span class="text-[10px] font-medium">Estado</span>
-    </a>
-    <a href="respirar.html" class="nav-item flex flex-col items-center gap-1 text-mute/50 focus-ring px-4 py-1">
-      <i data-lucide="wind" class="w-5 h-5"></i>
-      <span class="text-[10px]">Respirar</span>
-    </a>
-    <a href="perfil.html" class="nav-item flex flex-col items-center gap-1 text-mute/50 focus-ring px-4 py-1">
-      <i data-lucide="user" class="w-5 h-5"></i>
-      <span class="text-[10px]">Perfil</span>
+    <a href="cadastro.html" class="focus-ring w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-cream ring-1 ring-line text-ink text-sm font-medium hover:bg-sage-light transition">
+      <i data-lucide="user-plus" class="w-4 h-4 text-sage"></i> Não tenho uma conta
     </a>
   </div>
-</nav>
 
-<!-- TELA DE INTERVENÇÃO -->
-<div id="intervention" class="hidden fixed inset-0 z-50 bg-cream/97 backdrop-blur-sm flex-col items-center justify-center px-6 text-center animate-fadeIn">
-  <p class="text-[11px] text-clay font-medium tracking-wide uppercase mb-1">Sinal de vulnerabilidade elevado</p>
-  <h2 class="font-display font-bold text-xl text-ink mb-2">Vamos fazer uma pausa</h2>
-  <p class="text-[12.5px] text-mute leading-relaxed max-w-[300px] mb-7">Percebemos uma mudança nos seus sinais em relação ao seu padrão. Isso não significa que você vai apostar — é só um convite para respirar antes de abrir qualquer aplicativo de apostas.</p>
-
-  <div class="relative w-36 h-36 flex items-center justify-center mb-6">
-    <div class="absolute inset-0 rounded-full bg-sage-light animate-breathe"></div>
-    <div class="relative z-10 flex flex-col items-center">
-      <span id="int-instruction" class="font-display font-semibold text-sage text-sm">Inspire</span>
-      <span id="int-timer" class="font-display font-bold text-2xl text-ink num-tab mt-0.5">60s</span>
-    </div>
-  </div>
-
-  <div id="int-feedback" class="hidden w-full max-w-[280px] animate-fadeIn">
-    <p class="text-[12px] text-ink/80 mb-3">Esse aviso fez sentido pra você agora?</p>
-    <div class="grid grid-cols-2 gap-2">
-      <button onclick="closeIntervention()" class="focus-ring text-xs font-medium rounded-xl bg-sage text-white px-3 py-2.5 hover:brightness-105 transition">Sim, ajudou</button>
-      <button onclick="closeIntervention()" class="focus-ring text-xs font-medium rounded-xl bg-paper ring-1 ring-line text-ink px-3 py-2.5 hover:bg-cream transition">Não fazia sentido</button>
-    </div>
-  </div>
-
-  <button id="int-skip" onclick="closeIntervention()" class="focus-ring text-[11px] text-mute/60 hover:text-mute mt-5 underline underline-offset-2">Fechar por agora</button>
-</div>
-
-<!-- MODAL SOS -->
-<div id="modal-sos" class="hidden fixed inset-0 z-50 items-center justify-center p-4 bg-ink/30 backdrop-blur-sm">
-  <div class="animate-rise w-full max-w-sm rounded-2xl bg-paper ring-1 ring-line p-6 relative">
-    <button onclick="closeModal('modal-sos')" class="focus-ring absolute top-4 right-4 text-mute hover:text-ink"><i data-lucide="x" class="w-5 h-5"></i></button>
-    <div class="w-11 h-11 rounded-full bg-rose-light ring-1 ring-rose/30 flex items-center justify-center mb-3">
-      <i data-lucide="life-buoy" class="w-5 h-5 text-rose"></i>
-    </div>
-    <h3 class="font-display text-lg font-bold text-ink">Você não está sozinho</h3>
-    <p class="text-[13px] text-mute mt-1.5">Escolha uma opção de apoio imediato. Estamos com você agora.</p>
-    <div class="mt-4 space-y-2">
-      <button class="focus-ring w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-rose text-white text-sm font-semibold hover:brightness-105 transition">
-        <i data-lucide="phone" class="w-4 h-4"></i> Ligar para CVV — 188
-      </button>
-      <button class="focus-ring w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-cream ring-1 ring-line text-ink text-sm font-medium hover:bg-sage-light transition">
-        <i data-lucide="message-circle" class="w-4 h-4 text-sage"></i> Falar com um padrinho da rede de apoio
-      </button>
-      <a href="respirar.html" class="focus-ring w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-cream ring-1 ring-line text-ink text-sm font-medium hover:bg-sage-light transition">
-        <i data-lucide="wind" class="w-4 h-4 text-sage"></i> Fazer respiração guiada agora
-      </a>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL BLOQUEIO -->
-<div id="modal-lockdown" class="hidden fixed inset-0 z-[60] items-center justify-center p-4 bg-ink/40 backdrop-blur-sm">
-  <div class="animate-rise w-full max-w-sm rounded-2xl bg-paper ring-1 ring-rose/30 p-7 text-center">
-    <div class="w-14 h-14 rounded-full bg-rose-light ring-1 ring-rose/30 flex items-center justify-center mx-auto">
-      <i data-lucide="lock" class="w-6 h-6 text-rose"></i>
-    </div>
-    <span class="inline-block mt-4 text-[10.5px] font-semibold text-rose bg-rose-light rounded-full px-3 py-1 tracking-wide">PAUSA DE SEGURANÇA</span>
-    <h3 class="font-display text-lg font-bold text-ink mt-3">Acesso pausado por alguns minutos</h3>
-    <p class="text-[12.5px] text-mute mt-2 leading-relaxed">Para sua segurança financeira e emocional, o app fica em pausa protegida pelos próximos 15 minutos. Use esse tempo pra respirar e se afastar da tela.</p>
-
-    <div class="mt-6 flex flex-col items-center">
-      <p class="text-[10.5px] uppercase tracking-wide text-mute">Tempo restante</p>
-      <p id="lockdown-timer" class="font-display text-3xl font-bold text-rose num-tab mt-1">15:00</p>
-    </div>
-
-    <button onclick="cancelLockdown()" class="focus-ring mt-6 text-[11px] text-mute/60 hover:text-mute underline underline-offset-2">
-      Encerrar simulação (apenas para teste)
-    </button>
-  </div>
+  <p class="text-center text-[10.5px] text-mute/70 mt-6 leading-relaxed px-4">
+    Ambiente de demonstração — nenhum dado é enviado a um servidor. Use qualquer e-mail e senha para testar.
+  </p>
 </div>
 
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <script>
   lucide.createIcons();
-  const RING_TOTAL = 264;
-  let interventionTimer = null;
-  let interventionShown = false;
 
-  function ivaVisual(v) {
-    let color, label, desc;
-    if (v < 40) {
-      color = '#6E9080'; label = 'Estável';
-      desc = 'Seus sinais indicam baixo risco de decisão impulsiva de aposta agora.';
-    } else if (v < 65) {
-      color = '#B9A46A'; label = 'Atenção leve';
-      desc = 'Pequena variação em relação ao seu padrão. Vale observar como você está se sentindo em relação a apostar.';
-    } else {
-      color = '#C98A5E'; label = 'Elevado';
-      desc = 'Alteração significativa — maior risco de decisão impulsiva de aposta. Sugerimos uma pausa curta agora.';
+  document.getElementById('login-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value.trim();
+    const senha = document.getElementById('login-senha').value.trim();
+    const errorEl = document.getElementById('login-error');
+
+    if (!email || !senha) {
+      errorEl.classList.remove('hidden');
+      return;
     }
-    return { color, label, desc };
-  }
+    errorEl.classList.add('hidden');
 
-  function setIVA(v, animateHistory = true) {
-    v = Math.max(0, Math.min(100, v));
-    const { color, label, desc } = ivaVisual(v);
-    document.getElementById('iva-number').textContent = v;
-    document.getElementById('iva-label').textContent = label;
-    document.getElementById('iva-label').style.color = color;
-    document.getElementById('iva-desc').textContent = desc;
+    // Deriva um nome de exibição a partir do e-mail (sem backend, apenas para o teste)
+    const prefix = email.split('@')[0].replace(/[._\-\d]+/g, ' ').trim();
+    const nome = prefix
+      ? prefix.split(' ').filter(Boolean).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+      : 'Visitante';
 
-    const offset = RING_TOTAL - (RING_TOTAL * v / 100);
-    const ring = document.getElementById('iva-ring');
-    ring.style.strokeDashoffset = offset;
-    ring.style.stroke = color;
-
-    const fc = Math.round(72 + v * 0.42);
-    document.getElementById('fc-number').textContent = fc;
-
-    if (animateHistory) {
-      const dot = document.getElementById('history-dot');
-      const line = document.getElementById('history-line');
-      const y = 48 - (v * 0.32);
-      dot.setAttribute('cy', y);
-      const pts = line.getAttribute('points').split(' ');
-      pts[pts.length - 1] = `280,${y}`;
-      line.setAttribute('points', pts.join(' '));
-    }
-
-    if (v >= 65 && !interventionShown) {
-      interventionShown = true;
-      setTimeout(openIntervention, 500);
-    }
-    if (v < 65) interventionShown = false;
-  }
-
-  function simulateRise() {
-    let v = 22;
-    setIVA(v);
-    const step = setInterval(() => {
-      v += 6;
-      setIVA(v);
-      if (v >= 72) clearInterval(step);
-    }, 300);
-  }
-
-  function openIntervention() {
-    const modal = document.getElementById('intervention');
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-    document.getElementById('int-feedback').classList.add('hidden');
-    document.getElementById('int-skip').classList.remove('hidden');
-
-    let seconds = 60;
-    const timerEl = document.getElementById('int-timer');
-    const instrEl = document.getElementById('int-instruction');
-    timerEl.textContent = seconds + 's';
-    clearInterval(interventionTimer);
-    interventionTimer = setInterval(() => {
-      seconds--;
-      timerEl.textContent = Math.max(seconds, 0) + 's';
-      const phase = seconds % 10;
-      instrEl.textContent = phase >= 5 ? 'Inspire' : 'Expire';
-      if (seconds <= 0) {
-        clearInterval(interventionTimer);
-        instrEl.textContent = 'Pronto';
-        document.getElementById('int-feedback').classList.remove('hidden');
-        document.getElementById('int-skip').classList.add('hidden');
-      }
-    }, 1000);
-  }
-
-  function closeIntervention() {
-    clearInterval(interventionTimer);
-    const modal = document.getElementById('intervention');
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
-    setIVA(22);
-  }
-
-  function toggleDemo() {
-    document.getElementById('demo-panel').classList.toggle('hidden');
-  }
-
-  function openModal(id) {
-    const el = document.getElementById(id);
-    el.classList.remove('hidden');
-    el.classList.add('flex');
-  }
-  function closeModal(id) {
-    const el = document.getElementById(id);
-    el.classList.add('hidden');
-    el.classList.remove('flex');
-  }
-  function openSOS() { openModal('modal-sos'); }
-
-  const quotes = [
-    '"Você não precisa ver a escada inteira, só o próximo degrau."',
-    '"Cada dia estável é uma vitória que ninguém pode tirar de você."',
-    '"A vontade passa. A sua liberdade fica."',
-    '"Você já provou que consegue dizer não. Prove de novo hoje."',
-    '"O impulso dura minutos. O arrependimento pode durar meses."',
-    '"Recomeçar também é uma forma de vencer."',
-  ];
-  function newQuote() {
-    const el = document.getElementById('quote-text');
-    let q;
-    do { q = quotes[Math.floor(Math.random() * quotes.length)]; } while (q === el.textContent);
-    el.textContent = q;
-  }
-
-  let lockdownInterval = null;
-  function openLockdown() {
-    openModal('modal-lockdown');
-    let total = 15 * 60;
-    const timerEl = document.getElementById('lockdown-timer');
-    clearInterval(lockdownInterval);
-    lockdownInterval = setInterval(() => {
-      total--;
-      const m = String(Math.floor(total / 60)).padStart(2, '0');
-      const s = String(total % 60).padStart(2, '0');
-      timerEl.textContent = m + ':' + s;
-      if (total <= 0) {
-        clearInterval(lockdownInterval);
-        cancelLockdown();
-      }
-    }, 1000);
-  }
-  function cancelLockdown() {
-    clearInterval(lockdownInterval);
-    closeModal('modal-lockdown');
-    setIVA(22);
-  }
-
-  setIVA(22, false);
+    window.location.href = 'estado.html?nome=' + encodeURIComponent(nome);
+  });
 </script>
 </body>
 </html>

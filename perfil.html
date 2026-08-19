@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-<title>Aequo — Perfil</title>
+<title>Âncora — Perfil</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -46,14 +46,14 @@
   <div class="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
     <div class="flex items-center gap-2.5">
       <div class="w-9 h-9 rounded-xl bg-sage-light flex items-center justify-center ring-1 ring-sage/25">
-        <i data-lucide="activity" class="w-4.5 h-4.5 text-sage"></i>
+        <i data-lucide="anchor" class="w-4.5 h-4.5 text-sage"></i>
       </div>
       <div class="leading-tight">
-        <p class="font-display font-bold text-[16px] text-ink tracking-tight">Aequo</p>
+        <p class="font-display font-bold text-[16px] text-ink tracking-tight">Âncora</p>
         <p class="text-[10.5px] text-mute -mt-0.5 hidden sm:block">seu progresso</p>
       </div>
     </div>
-    <a href="index.html" class="focus-ring hidden sm:flex items-center gap-1.5 text-[11px] text-mute hover:text-ink transition">
+    <a href="estado.html" data-internal class="focus-ring hidden sm:flex items-center gap-1.5 text-[11px] text-mute hover:text-ink transition">
       <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> voltar ao estado
     </a>
   </div>
@@ -64,10 +64,10 @@
   <!-- Cabeçalho de perfil -->
   <div class="flex items-center gap-3 mb-5 animate-rise">
     <div class="w-12 h-12 rounded-full bg-sage-light ring-1 ring-sage/25 flex items-center justify-center">
-      <span class="font-display font-bold text-sage">M</span>
+      <span data-user-initial class="font-display font-bold text-sage">V</span>
     </div>
     <div>
-      <p class="font-display font-bold text-ink text-base">Marcos Almeida</p>
+      <p data-user-name class="font-display font-bold text-ink text-base">Visitante</p>
       <p class="text-[11px] text-mute">Acompanhamento desde 30 jul 2026</p>
     </div>
   </div>
@@ -145,7 +145,7 @@
         <i data-lucide="chevron-right" class="w-4 h-4 text-mute/60"></i>
       </button>
       <button class="focus-ring w-full flex items-center justify-between px-4 py-3.5 text-left">
-        <span class="flex items-center gap-2.5 text-[12.5px] text-ink"><i data-lucide="users" class="w-4 h-4 text-mute"></i> Compartilhar com um familiar</span>
+        <span class="flex items-center gap-2.5 text-[12.5px] text-ink"><i data-lucide="heart-handshake" class="w-4 h-4 text-mute"></i> Pessoa de confiança</span>
         <i data-lucide="chevron-right" class="w-4 h-4 text-mute/60"></i>
       </button>
       <button class="focus-ring w-full flex items-center justify-between px-4 py-3.5 text-left">
@@ -161,15 +161,15 @@
 
 <nav class="fixed bottom-0 inset-x-0 z-30 border-t border-line glass">
   <div class="max-w-5xl mx-auto px-6 py-2.5 flex items-center justify-around">
-    <a href="index.html" class="nav-item flex flex-col items-center gap-1 text-mute/50 focus-ring px-4 py-1">
+    <a href="estado.html" data-internal class="nav-item flex flex-col items-center gap-1 text-mute/50 focus-ring px-4 py-1">
       <i data-lucide="activity" class="w-5 h-5"></i>
       <span class="text-[10px]">Estado</span>
     </a>
-    <a href="respirar.html" class="nav-item flex flex-col items-center gap-1 text-mute/50 focus-ring px-4 py-1">
+    <a href="respirar.html" data-internal class="nav-item flex flex-col items-center gap-1 text-mute/50 focus-ring px-4 py-1">
       <i data-lucide="wind" class="w-5 h-5"></i>
       <span class="text-[10px]">Respirar</span>
     </a>
-    <a href="perfil.html" class="nav-item active flex flex-col items-center gap-1 text-sage focus-ring px-4 py-1">
+    <a href="perfil.html" data-internal class="nav-item active flex flex-col items-center gap-1 text-sage focus-ring px-4 py-1">
       <i data-lucide="user" class="w-5 h-5"></i>
       <span class="text-[10px] font-medium">Perfil</span>
     </a>
@@ -179,6 +179,18 @@
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <script>
   lucide.createIcons();
+
+  (function carryUserName() {
+    const params = new URLSearchParams(window.location.search);
+    const nome = params.get('nome') || 'Visitante';
+    document.querySelectorAll('[data-user-name]').forEach(el => el.textContent = nome);
+    document.querySelectorAll('[data-user-initial]').forEach(el => el.textContent = nome.charAt(0).toUpperCase());
+    document.querySelectorAll('a[data-internal]').forEach(a => {
+      const url = new URL(a.getAttribute('href'), window.location.href);
+      url.searchParams.set('nome', nome);
+      a.setAttribute('href', url.pathname + url.search);
+    });
+  })();
 </script>
 </body>
 </html>

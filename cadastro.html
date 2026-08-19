@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Âncora — Criar conta</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: { display: ['Manrope','sans-serif'], body: ['Inter','sans-serif'] },
+        colors: {
+          cream:'#F3F1EA', paper:'#FFFFFF', ink:'#2B3532', mute:'#6E7A76',
+          sage:{ DEFAULT:'#6E9080', light:'#E4EBE6', dim:'#DCE6E0' },
+          clay:{ DEFAULT:'#C98A5E', light:'#F3E3D6', dim:'#EFDCC9' },
+          rose:{ DEFAULT:'#A9614C', light:'#F1E0D9', dim:'#EAD2C6' },
+          line:'#E4E1D8',
+        },
+        keyframes: {
+          rise:{'0%':{transform:'translateY(12px)',opacity:'0'},'100%':{transform:'translateY(0)',opacity:'1'}},
+          slideL:{'0%':{transform:'translateX(16px)',opacity:'0'},'100%':{transform:'translateX(0)',opacity:'1'}},
+        },
+        animation: { rise:'rise 0.5s ease-out', slideL:'slideL 0.35s ease-out' }
+      }
+    }
+  }
+</script>
+<style>
+  html, body { background:#F3F1EA; }
+  .focus-ring:focus-visible { outline:2px solid #6E9080; outline-offset:2px; }
+  input:focus, textarea:focus { outline:none; }
+  .field:focus-within { border-color:#6E9080; background:#fff; }
+  .choice-btn.selected { background:#6E9080; color:#fff; border-color:#6E9080; }
+  .chip-btn.selected { background:#E4EBE6; border-color:#6E9080; color:#2B3532; }
+  .chip-btn.selected .chip-check { opacity:1; transform:scale(1); }
+  .perm-card.selected { border-color:#6E9080; background:#E4EBE6; }
+  .dot { width:5px; height:5px; border-radius:9999px; background:#E4E1D8; transition:.3s; flex-shrink:0; }
+  .dot.active { background:#6E9080; width:16px; border-radius:9999px; }
+  .dot.done { background:#B7CCC0; }
+  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar-thumb { background:#E4E1D8; border-radius:8px; }
+</style>
+</head>
+
+<body class="font-body text-ink antialiased min-h-screen flex items-center justify-center px-4 py-8">
+
+<div class="w-full max-w-md">
+
+  <!-- Header + progresso -->
+  <div class="flex items-center justify-between mb-5 animate-rise">
+    <div class="flex items-center gap-2">
+      <div class="w-9 h-9 rounded-xl bg-sage-light flex items-center justify-center ring-1 ring-sage/25">
+        <i data-lucide="anchor" class="w-4.5 h-4.5 text-sage"></i>
+      </div>
+      <p class="font-display font-bold text-ink text-base">Âncora</p>
+    </div>
+    <a href="index.html" class="focus-ring text-[11.5px] text-sage font-medium">Já tenho uma conta</a>
+  </div>
+
+  <div id="progress-bar" class="w-full h-1.5 rounded-full bg-line overflow-hidden mb-1 animate-rise">
+    <div id="progress-fill" class="h-full bg-sage rounded-full transition-all duration-300" style="width:0%"></div>
+  </div>
+  <p id="progress-label" class="text-[10px] text-mute text-right mb-5 animate-rise"></p>
+
+  <!-- Card do wizard -->
+  <div class="rounded-3xl bg-paper ring-1 ring-line p-6 sm:p-8 min-h-[380px] max-h-[74vh] overflow-y-auto flex flex-col">
+    <div id="step-container" class="flex-1"></div>
+  </div>
+
+  <p class="text-center text-[10.5px] text-mute/70 mt-5 leading-relaxed px-4">
+    Quase tudo aqui é opcional e serve só para personalizar sua experiência — você pode pular qualquer pergunta.
+  </p>
+</div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+  const answers = {};
+  let current = 0;
+
+  const steps = [
+    // ---------- 1. Cadastro básico ----------
+    { id:'nome', type:'text', required:true, icon:'user', section:'Cadastro básico',
+      title:'Como você gostaria de ser chamado?', subtitle:'Vamos usar esse nome nas suas telas.',
+      placeholder:'Seu nome ou apelido' },
+
+    { id:'faixa_etaria', type:'choice', required:true, section:'Cadastro básico',
+      title:'Qual sua faixa etária?', subtitle:'Preferimos isso a pedir sua data de nascimento completa.',
+      options:['18–24 anos','25–34 anos','35–44 anos','45–54 anos','55+ anos'] },
+
+    { id:'email', type:'email', required:true, icon:'mail', section:'Cadastro básico',
+      title:'Qual o seu e-mail?', subtitle:'Usado só para você entrar de novo depois.',
+      placeholder:'voce@email.com' },
+
+    { id:'senha', type:'password', required:true, icon:'lock', section:'Cadastro básico',
+      title:'Crie uma senha', subtitle:'Pode ser simples — isso é um ambiente de teste.',
+      placeholder:'••••••••' },
+
+    { id:'objetivo', type:'choice', required:true, section:'Cadastro básico',
+      title:'Qual é o seu principal objetivo?', subtitle:'Isso muda como a gente te acompanha daqui pra frente.',
+      options:['Parar completamente de apostar','Reduzir apostas','Evitar recaídas','Apenas monitorar meu comportamento'] },
+
+    // ---------- 2. Perfil de apostas ----------
+    { id:'modalidades', type:'multi', required:false, section:'Perfil de apostas',
+      title:'Sobre o que você costuma apostar?',
+      options:['Futebol','Basquete','Tênis','eSports','Cassino online','Jogos instantâneos','Outros'] },
+
+    { id:'competicoes', type:'multi', required:false, section:'Perfil de apostas',
+      title:'Quais competições você mais acompanha?',
+      options:['Brasileirão','Champions League','Premier League','Libertadores','NBA','Outras'] },
+
+    { id:'times', type:'textarea', required:false, section:'Perfil de apostas',
+      title:'Quais times você acompanha?', subtitle:'Isso ajuda a dar mais relevância a jogos importantes pra você. Separe por vírgula.',
+      placeholder:'Ex: Corinthians, Real Madrid...' },
+
+    // ---------- 3. Padrão de comportamento ----------
+    { id:'momentos_vontade', type:'multi', required:false, section:'Padrão de comportamento',
+      title:'Quando você costuma sentir mais vontade de apostar?',
+      options:['Antes dos jogos','Durante os jogos','Depois dos jogos','Quando estou entediado','Quando estou ansioso/estressado','Depois de perder uma aposta','Quando recebo dinheiro','Finais de semana','À noite','Não sei identificar'] },
+
+    { id:'periodo', type:'choice', required:false, section:'Padrão de comportamento',
+      title:'Em quais períodos isso acontece com mais frequência?',
+      options:['Manhã','Tarde','Noite','Madrugada'] },
+
+    // ---------- 4. Gatilhos individuais ----------
+    { id:'gatilhos', type:'multi', required:false, section:'Gatilhos individuais',
+      title:'O que normalmente aumenta sua vontade de apostar?',
+      options:['Assistir a partidas','Notificações de casas de aposta','Odds e promoções','Amigos falando sobre apostas','Redes sociais','Perder dinheiro e tentar recuperar','Ganhar uma aposta anterior','Ansiedade','Tédio','Outro'] },
+
+    { id:'gatilho_outro', type:'textarea', required:false, section:'Gatilhos individuais',
+      title:'Você reconhece algum outro gatilho?', subtitle:'Campo opcional — escreva com suas palavras.',
+      placeholder:'Ex: quando fico sozinho à noite...' },
+
+    // ---------- 5. Casas e aplicativos ----------
+    { id:'plataformas', type:'multi', required:false, section:'Plataformas', notice:'Não pedimos usuário, senha nem acesso à sua conta nessas plataformas — só o nome, para reconhecer o contexto de notificações.',
+      title:'Quais plataformas normalmente fazem parte do seu contexto de apostas?',
+      options:['Bet365','Betano','Sportingbet','Superbet','Outras'] },
+
+    // ---------- 6. Histórico ----------
+    { id:'tempo_apostando', type:'choice', required:false, section:'Histórico',
+      title:'Há quanto tempo você aposta?',
+      options:['Menos de 6 meses','6–12 meses','1–2 anos','Mais de 2 anos'] },
+
+    { id:'frequencia', type:'choice', required:false, section:'Histórico',
+      title:'Com que frequência você costuma apostar?',
+      options:['Raramente','Algumas vezes por mês','Algumas vezes por semana','Diariamente','Várias vezes ao dia'] },
+
+    { id:'tentou_parar', type:'choice', required:false, section:'Histórico',
+      title:'Você já tentou parar ou reduzir antes?',
+      options:['Sim','Não'] },
+
+    { id:'dificuldades', type:'textarea', required:false, section:'Histórico',
+      title:'Se sim, quais situações tornaram isso mais difícil?', subtitle:'Pode pular se não se aplicar a você.',
+      placeholder:'Escreva livremente...' },
+
+    // ---------- 10. Contexto digital ----------
+    { id:'permissoes', type:'permissions', required:false, section:'Contexto digital',
+      title:'Quais informações você quer compartilhar com o Âncora?',
+      subtitle:'Cada uma é opcional e pode ser desligada quando quiser.',
+      options:[
+        { label:'Notificações relacionadas a apostas', why:'Ajuda a identificar exposição a promoções e eventos.' },
+        { label:'Uso de aplicativos selecionados', why:'Ajuda a identificar momentos associados ao comportamento.' },
+        { label:'Eventos esportivos relevantes', why:'Ajuda o sistema a reconhecer partidas relacionadas aos seus interesses.' },
+        { label:'Localização aproximada', why:'Só usamos se isso vier a ter uma finalidade real e explicada.' },
+      ] },
+
+    // ---------- 11. Pessoa de confiança ----------
+    { id:'confianca', type:'contact', required:false, section:'Pessoa de confiança',
+      title:'Quem pode te ajudar em um momento difícil?', subtitle:'Totalmente opcional — você pode adicionar isso depois no perfil.' },
+
+    { id:'quando_contatar', type:'choice', required:false, section:'Pessoa de confiança',
+      title:'Quando podemos entrar em contato com essa pessoa?',
+      options:['Somente quando eu solicitar','Quando eu ignorar repetidamente alertas de alto risco','Em situações previamente configuradas','Nunca automaticamente'] },
+
+    // ---------- 12. Como você quer ser ajudado ----------
+    { id:'ajuda', type:'multi', required:false, section:'Como te ajudar',
+      title:'Quando identificarmos uma situação de risco, o que você prefere?',
+      options:['Vibrar minha smartband','Enviar uma mensagem','Iniciar exercício de respiração','Ocultar notificações relacionadas a apostas','Sugerir bloqueio temporário','Lembrar meus objetivos','Mostrar quanto tempo estou sem apostar','Oferecer contato com pessoa de confiança'] },
+
+    // ---------- 13. Pergunta emocional ----------
+    { id:'motivacao', type:'textarea', required:false, icon:'heart', section:'Sua motivação',
+      title:'Por que você quer mudar sua relação com as apostas?',
+      subtitle:'Vamos guardar isso pra te lembrar nos dias mais difíceis.',
+      placeholder:'Escreva com suas palavras...' },
+
+    // ---------- Calibração ----------
+    { id:'calibracao', type:'info', section:'Smartband',
+      title:'Vamos conhecer seu padrão',
+      body:'Depois de conectar sua smartband, o Âncora observa alguns minutos de frequência cardíaca e movimento em repouso. É esse padrão pessoal — não um número genérico — que usamos pra perceber quando algo muda de verdade.',
+      icon:'heart-pulse' },
+
+    { id:'final', type:'final' },
+  ];
+
+  function totalRequiredSteps() { return steps.length - 1; }
+
+  function renderProgress() {
+    const pct = Math.round((current / (steps.length - 1)) * 100);
+    document.getElementById('progress-fill').style.width = pct + '%';
+    const step = steps[current];
+    document.getElementById('progress-label').textContent =
+      step.type === 'final' ? '' : `${step.section} · ${current + 1} de ${steps.length - 1}`;
+  }
+
+  function fieldHtml(step) {
+    if (step.type === 'textarea') {
+      return `<textarea id="input-${step.id}" rows="4" placeholder="${step.placeholder || ''}"
+                class="w-full bg-cream rounded-xl ring-1 ring-line px-3.5 py-3 text-[13.5px] text-ink placeholder:text-mute/60 field transition resize-none">${answers[step.id] || ''}</textarea>`;
+    }
+
+    if (step.type === 'choice') {
+      return `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">` +
+        step.options.map(opt => `
+          <button type="button" data-value="${opt}"
+            class="choice-btn ${answers[step.id] === opt ? 'selected' : ''} focus-ring text-left text-[13px] font-medium rounded-xl ring-1 ring-line bg-cream text-ink px-3.5 py-2.5 hover:ring-sage/40 transition"
+            onclick="selectChoice('${step.id}', this.dataset.value)">${opt}</button>
+        `).join('') + `</div>`;
+    }
+
+    if (step.type === 'multi') {
+      const selected = answers[step.id] || [];
+      return (step.notice ? `<p class="text-[11px] text-mute bg-sage-light/60 ring-1 ring-sage/20 rounded-lg px-3 py-2 mb-3 leading-relaxed">${step.notice}</p>` : '') +
+        `<div class="flex flex-wrap gap-2">` +
+        step.options.map(opt => `
+          <button type="button" data-value="${opt}"
+            class="chip-btn ${selected.includes(opt) ? 'selected' : ''} focus-ring flex items-center gap-1.5 text-[12.5px] font-medium rounded-full ring-1 ring-line bg-cream text-ink pl-3 pr-3.5 py-2 hover:ring-sage/40 transition"
+            onclick="toggleMulti('${step.id}', this.dataset.value)">
+            <span class="chip-check w-3.5 h-3.5 rounded-full bg-sage flex items-center justify-center opacity-0 scale-75 transition">
+              <i data-lucide="check" class="w-2.5 h-2.5 text-white"></i>
+            </span>${opt}
+          </button>
+        `).join('') + `</div>`;
+    }
+
+    if (step.type === 'permissions') {
+      const selected = answers[step.id] || [];
+      return `<div class="space-y-2.5">` +
+        step.options.map((opt, i) => `
+          <button type="button" data-idx="${i}"
+            class="perm-card ${selected.includes(opt.label) ? 'selected' : ''} focus-ring w-full text-left rounded-xl ring-1 ring-line bg-cream px-3.5 py-3 transition hover:ring-sage/40"
+            onclick="togglePermission('${step.id}', this.dataset.idx)">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-[12.5px] font-semibold text-ink">${opt.label}</p>
+                <p class="text-[11px] text-mute mt-0.5 leading-relaxed">${opt.why}</p>
+              </div>
+              <div class="w-5 h-5 rounded-full ring-1 ring-line bg-white flex items-center justify-center shrink-0 mt-0.5">
+                <i data-lucide="check" class="w-3 h-3 text-sage ${selected.includes(opt.label) ? '' : 'opacity-0'}"></i>
+              </div>
+            </div>
+          </button>
+        `).join('') + `</div>`;
+    }
+
+    if (step.type === 'contact') {
+      const c = answers[step.id] || { nome:'', relacao:'', contato:'' };
+      return `<div class="space-y-3">
+        <div class="field flex items-center gap-2 rounded-xl bg-cream ring-1 ring-line px-3.5 py-3 transition">
+          <i data-lucide="user" class="w-4 h-4 text-mute shrink-0"></i>
+          <input id="contact-nome" placeholder="Nome" value="${c.nome}" class="w-full bg-transparent text-[13.5px] text-ink placeholder:text-mute/60">
+        </div>
+        <div class="field flex items-center gap-2 rounded-xl bg-cream ring-1 ring-line px-3.5 py-3 transition">
+          <i data-lucide="heart-handshake" class="w-4 h-4 text-mute shrink-0"></i>
+          <input id="contact-relacao" placeholder="Relação (ex: amigo, irmã...)" value="${c.relacao}" class="w-full bg-transparent text-[13.5px] text-ink placeholder:text-mute/60">
+        </div>
+        <div class="field flex items-center gap-2 rounded-xl bg-cream ring-1 ring-line px-3.5 py-3 transition">
+          <i data-lucide="phone" class="w-4 h-4 text-mute shrink-0"></i>
+          <input id="contact-contato" placeholder="Telefone ou contato" value="${c.contato}" class="w-full bg-transparent text-[13.5px] text-ink placeholder:text-mute/60">
+        </div>
+      </div>`;
+    }
+
+    if (step.type === 'info') {
+      return `<div class="flex flex-col items-center text-center py-2">
+        <div class="w-14 h-14 rounded-full bg-sage-light ring-1 ring-sage/25 flex items-center justify-center mb-4">
+          <i data-lucide="${step.icon}" class="w-6 h-6 text-sage"></i>
+        </div>
+        <p class="text-[13.5px] text-mute leading-relaxed max-w-[320px]">${step.body}</p>
+      </div>`;
+    }
+
+    // text / email / password
+    return `<div class="field flex items-center gap-2 rounded-xl bg-cream ring-1 ring-line px-3.5 py-3 transition">
+              <i data-lucide="${step.icon}" class="w-4 h-4 text-mute shrink-0"></i>
+              <input id="input-${step.id}" type="${step.type}" placeholder="${step.placeholder || ''}" value="${answers[step.id] || ''}"
+                     class="w-full bg-transparent text-[13.5px] text-ink placeholder:text-mute/60">
+            </div>`;
+  }
+
+  function selectChoice(id, value) { answers[id] = value; renderStep(); }
+
+  function toggleMulti(id, value) {
+    const arr = answers[id] || [];
+    answers[id] = arr.includes(value) ? arr.filter(v => v !== value) : [...arr, value];
+    renderStep();
+  }
+
+  function togglePermission(id, idx) {
+    const step = steps.find(s => s.id === id);
+    const label = step.options[idx].label;
+    const arr = answers[id] || [];
+    answers[id] = arr.includes(label) ? arr.filter(v => v !== label) : [...arr, label];
+    renderStep();
+  }
+
+  function renderStep() {
+    renderProgress();
+    const step = steps[current];
+    const container = document.getElementById('step-container');
+
+    if (step.type === 'final') {
+      const primeiroNome = answers.nome ? answers.nome.split(' ')[0] : 'tudo certo';
+      container.innerHTML = `
+        <div class="animate-slideL flex flex-col items-center text-center justify-center h-full py-4">
+          <div class="w-14 h-14 rounded-full bg-sage-light ring-1 ring-sage/25 flex items-center justify-center mb-4">
+            <i data-lucide="check-circle-2" class="w-7 h-7 text-sage"></i>
+          </div>
+          <h2 class="font-display font-bold text-xl text-ink">Prontinho, ${primeiroNome}!</h2>
+          <p class="text-[13px] text-mute mt-2 max-w-[300px] leading-relaxed">Sua conta foi criada. Dentro do app você vai ter um botão pra usar sempre que sentir vontade de apostar — é só apertar, sem precisar explicar nada.</p>
+          ${answers.motivacao ? `<div class="mt-4 w-full rounded-xl bg-sage-light/60 ring-1 ring-sage/20 px-4 py-3 text-left">
+            <p class="text-[10.5px] text-sage font-semibold uppercase tracking-wide mb-1">Você nos disse</p>
+            <p class="text-[12.5px] text-ink/80 leading-relaxed">"${answers.motivacao}"</p>
+          </div>` : ''}
+          <button onclick="finish()" class="focus-ring mt-6 w-full px-5 py-3 rounded-xl bg-sage text-white text-sm font-semibold hover:brightness-105 transition flex items-center justify-center gap-2">
+            Entrar no Âncora <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>`;
+      lucide.createIcons();
+      return;
+    }
+
+    const skip = !step.required ? `<button type="button" onclick="skipStep()" class="focus-ring text-[12px] text-mute hover:text-ink underline underline-offset-2">Pular</button>` : '';
+    const back = current > 0 ? `<button type="button" onclick="prevStep()" class="focus-ring text-[12px] text-mute hover:text-ink flex items-center gap-1"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Voltar</button>` : `<span></span>`;
+    const isInfo = step.type === 'info';
+
+    container.innerHTML = `
+      <form id="step-form" class="animate-slideL flex flex-col h-full">
+        <p class="text-[10.5px] text-sage font-semibold uppercase tracking-wide mb-1">${step.section}</p>
+        <h2 class="font-display font-bold text-lg text-ink leading-snug">${step.title}</h2>
+        ${step.subtitle ? `<p class="text-[12.5px] text-mute mt-1.5 mb-5">${step.subtitle}</p>` : '<div class="mb-4"></div>'}
+        <div class="flex-1">${fieldHtml(step)}</div>
+        <p id="step-error" class="hidden text-[11.5px] text-rose mt-3">Preencha este campo para continuar.</p>
+        <div class="flex items-center justify-between mt-6 pt-1">
+          ${back}
+          <div class="flex items-center gap-3">
+            ${isInfo ? '' : skip}
+            <button type="submit" class="focus-ring px-5 py-2.5 rounded-xl bg-sage text-white text-sm font-semibold hover:brightness-105 transition flex items-center gap-1.5">
+              ${isInfo ? 'Entendi' : 'Continuar'} <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+      </form>`;
+    lucide.createIcons();
+
+    const input = document.getElementById(`input-${step.id}`);
+    if (input) input.focus();
+
+    document.getElementById('step-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      nextStep();
+    });
+  }
+
+  function nextStep() {
+    const step = steps[current];
+
+    if (['text','email','password','textarea'].includes(step.type)) {
+      const input = document.getElementById(`input-${step.id}`);
+      if (input) answers[step.id] = input.value.trim();
+    }
+    if (step.type === 'contact') {
+      answers[step.id] = {
+        nome: document.getElementById('contact-nome').value.trim(),
+        relacao: document.getElementById('contact-relacao').value.trim(),
+        contato: document.getElementById('contact-contato').value.trim(),
+      };
+    }
+    if (step.required && !answers[step.id]) {
+      document.getElementById('step-error').classList.remove('hidden');
+      return;
+    }
+    current++;
+    renderStep();
+  }
+
+  function skipStep() { current++; renderStep(); }
+  function prevStep() { if (current > 0) { current--; renderStep(); } }
+
+  function finish() {
+    const nome = answers.nome || 'Visitante';
+    window.location.href = 'estado.html?nome=' + encodeURIComponent(nome);
+  }
+
+  renderStep();
+</script>
+</body>
+</html>
